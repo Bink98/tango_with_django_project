@@ -26,15 +26,14 @@ MEDIA_URL = '/media/'
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-key = None
-with open('../../config/tango_with_django_project/secret.key') as f:
+with open(os.path.join(BASE_DIR, '../config/tango_with_django_project/secret.key')) as f:
     key = f.read().strip()
 SECRET_KEY = key
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['bink.pythonanywhere.com']
+ALLOWED_HOSTS = ['127.0.0.1', 'bink.pythonanywhere.com']
 
 
 # Application definition
@@ -86,7 +85,7 @@ WSGI_APPLICATION = 'tango_with_django_project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
-DATABASES = json.load(open('../../config/tango_with_django_project/database.json','r'))
+DATABASES = json.load(open(os.path.join(BASE_DIR, '../config/tango_with_django_project/database.json')))
 
 
 # Password validation
