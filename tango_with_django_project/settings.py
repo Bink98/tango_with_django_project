@@ -27,7 +27,7 @@ MEDIA_URL = '/media/'
 
 # SECURITY WARNING: keep the secret key used in production secret!
 key = None
-with open('/home/bink/secret.key') as f:
+with open('../../config/tango_with_django_project/secret.key') as f:
     key = f.read().strip()
 SECRET_KEY = key
 
@@ -86,7 +86,7 @@ WSGI_APPLICATION = 'tango_with_django_project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
-DATABASES = json.load(open('/home/bink/database.json','r'))
+DATABASES = json.load(open('../../config/tango_with_django_project/database.json','r'))
 
 
 # Password validation
