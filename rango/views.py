@@ -6,15 +6,19 @@ from django.urls import reverse
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from datetime import datetime
 
 
 def index(request):
     category_list = Category.objects.order_by('-likes')[:5]
     pages_list = Page.objects.order_by('-views')[:5]
-    context_dict = {}
-    context_dict['boldmessage'] = 'Crunchy, creamy, cookie, candy, cupcake!'
-    context_dict['categories'] = category_list
-    context_dict['pages'] = pages_list
+    context_dict = {'boldmessage': 'Crunchy, creamy, cookie, candy, cupcake!',
+                    'categories': category_list,
+                    'pages': pages_list,
+                    }
+
+    # Call the helper function to handle the cookies
+
     return render(request, 'rango/index.html', context_dict)
 
 
@@ -108,7 +112,7 @@ def register(request):
         # If the two forms are valid...
         if user_form.is_valid() and profile_form.is_valid():
             # Save the user's form data to the database.
-            user = user_form.save
+            user = user_form.save()
             # Now we hash the password with the set_password method.
             # Once hashed, we can update the user object.
             user.set_password(user.password)
@@ -123,10 +127,6 @@ def register(request):
             # Did the user provide a profile picture?
             # If so, we need to get it from the input form and
             # put it in the UserProfile model.
-            if 'picture' in request.FILES:
-                profile.picture = request.FILES['picture']
-            # Now we save the UserProfile model instance.
-            profile.save()
             # Update our variable to indicate that the template
             # registration was successful.
             registered = True
@@ -146,11 +146,10 @@ def register(request):
 
 
 def about(request):
-    # prints out whether the method is a GET or a POST
-    print(request.method)
-    # prints out the user name, if no one is logged in it prints `AnonymousUser`
-    print(request.user)
-    return render(request, 'rango/about.html', {})
+    visitor_cookie_handler(request)
+    context_dict = {'visits': request.session['visits'],
+                    'last_visit': request.session['last_visit']}
+    return render(request, 'rango/about.html', context_dict)
 
 
 def user_login(request):
@@ -204,3 +203,24 @@ def user_logout(request):
     logout(request)
     # Take the user back to the homepage.
     return redirect(reverse('rango:index'))
+
+
+def visitor_cookie_handler(request):
+    # Get the number of visits to the site.
+    # We use the COOKIES.get() function to obtain the visits cookie.
+    # If the cookie exists, the value returned is casted to an integer.
+    # If the cookie doesn't exist, then the default value of 1 is used.
+    visits = int(request.session.get('visits', '1'))
+    last_visit_cookie = request.session.get('last_visit', str(datetime.now()))
+    last_visit_time = datetime.strptime(last_visit_cookie[:-7], '%Y-%m-%d %H:%M:%S')
+    # If it's been more than a day since the last visit...
+    if (datetime.now() - last_visit_time).days > 0:
+        visits = visits + 1
+        # Update the last visit cookie now that we have updated the count
+        request.session['last_visit'] = str(datetime.now())
+    else:
+        # Set the last visit cookie
+        request.session['last_visit'] = last_visit_cookie
+    # Update/set the visits cookie
+    request.session['visits'] = visits
+

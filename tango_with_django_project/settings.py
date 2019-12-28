@@ -31,7 +31,7 @@ with open(os.path.join(BASE_DIR, '../config/tango_with_django_project/secret.key
 SECRET_KEY = key
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1', 'bink.pythonanywhere.com']
 
