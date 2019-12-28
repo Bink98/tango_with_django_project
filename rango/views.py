@@ -1,4 +1,6 @@
 from django.shortcuts import render
+from django.utils.decorators import method_decorator
+
 from rango.models import Category, Page
 from rango.forms import CategoryForm, PageForm, UserForm, UserProfileForm
 from django.shortcuts import redirect
@@ -223,4 +225,18 @@ def visitor_cookie_handler(request):
         request.session['last_visit'] = last_visit_cookie
     # Update/set the visits cookie
     request.session['visits'] = visits
+
+
+@login_required
+def like_category(request):
+    category_id = request.GET['category_id']
+    try:
+        category = Category.objects.get(id=int(category_id))
+    except Category.DoesNotExist:
+        return HttpResponse(-1)
+    except ValueError:
+        return HttpResponse(-1)
+    category.likes = category.likes + 1
+    category.save()
+    return HttpResponse(category.likes)
 
